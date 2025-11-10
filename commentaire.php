@@ -2,7 +2,7 @@
 require_once __DIR__ . '/header.php';
 ensure_session_started();
 
-// Accessible uniquement aux utilisateurs connectés
+
 if (!isset($_SESSION['user'])) {
     header('Location: connexion.php');
     exit;
@@ -11,13 +11,11 @@ if (!isset($_SESSION['user'])) {
 $error = '';
 $success = false;
 
-// Connexion DB
 $conn = new mysqli("localhost", "root", "", "livreor");
 if ($conn->connect_error) {
     $error = "Impossible de se connecter à la base de données: " . $conn->connect_error;
 }
 
-// Déterminer la table et les colonnes comme dans livre-or.php
 $table = null;
 $columns = [];
 $candidates = ['commentaires','commentaire','livre_or','livreor','comments','comment','messages','posts'];
@@ -59,19 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($error)) {
     } elseif (!$table) {
         $error = 'Aucune table de commentaires trouvée dans la base de données.';
     } else {
-        // Préparer valeurs à insérer
         $cols = [];
         $vals = [];
         $types = '';
 
-        // contenu
         if ($contentCol) {
             $cols[] = "`$contentCol`";
             $vals[] = $commentText;
             $types .= 's';
         } else {
-            // pas de colonne texte détectée -> essayer d'insérer dans n'importe quelle colonne string
-            // chercher une colonne textuelle
             $foundText = false;
             foreach ($columns as $c) {
                 if (in_array($c, ['id','date','created_at','created'])) continue;
@@ -86,12 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($error)) {
             }
         }
 
-        // utilisateur
+
         if ($userCol) {
-            // si colonne contient "id" ou ressemble à id, insérer id utilisateur
             $lower = strtolower($userCol);
             if (strpos($lower,'id') !== false && $lower !== 'login') {
-                // récupérer id de l'utilisateur connecté
                 $uId = null;
                 $uStmt = $conn->prepare("SELECT id FROM utilisateurs WHERE login = ? LIMIT 1");
                 if ($uStmt) {
@@ -105,14 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($error)) {
                 $vals[] = $uId;
                 $types .= 'i';
             } else {
-                // colonne login ou similaire
                 $cols[] = "`$userCol`";
                 $vals[] = $_SESSION['user'];
                 $types .= 's';
             }
         }
 
-        // date
         if ($dateCol) {
             $cols[] = "`$dateCol`";
             $now = date('Y-m-d H:i:s');
@@ -128,7 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($error)) {
             if (!$stmt) {
                 $error = 'Erreur préparation insertion: ' . $conn->error;
             } else {
-                // bind params dynamically
                 $bindNames = [];
                 $bindNames[] = $types;
                 for ($i=0;$i<count($vals);$i++) {
@@ -138,7 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($error)) {
                 if ($stmt->execute()) {
                     $success = true;
                     $stmt->close();
-                    // Redirection vers le livre d'or
                     header('Location: livre-or.php');
                     exit;
                 } else {
