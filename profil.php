@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/header.php';
 ensure_session_started();
-// Protection de la page : redirection si pas connecté
 if (!isset($_SESSION['user'])) {
     header('Location: index.php');
     exit;
@@ -14,6 +13,7 @@ if (!isset($_SESSION['user'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
     <style>label{display:block;margin-top:8px;}input{display:block;margin-bottom:8px;}</style>
+    <?php render_site_head(); ?>
 </head>
 <body>
     <?php render_site_header(); ?>

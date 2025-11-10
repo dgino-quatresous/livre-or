@@ -2,7 +2,6 @@ $
 <?php
 require_once __DIR__ . '/header.php';
 ensure_session_started();
-// Traitement du formulaire avant tout affichage HTML pour permettre l'utilisation de header()
 $error = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $login = isset($_POST["login"]) ? trim($_POST["login"]) : '';
@@ -12,12 +11,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($confirm_password !== $password) {
         $error = "Les mots de passe ne correspondent pas.";
     } else {
-        // Connexion à la base de données
         $conn = new mysqli("localhost", "root", "", "livreor");
         if ($conn->connect_error) {
             die("Connexion échouée: " . $conn->connect_error);
         }
-        // Vérification si l'utilisateur existe déjà
         $stmt = $conn->prepare("SELECT id FROM utilisateurs WHERE login = ?");
         $stmt->bind_param("s", $login);
         $stmt->execute();
@@ -27,14 +24,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->close();
             $conn->close();
         } else {
-            // Insertion du nouvel utilisateur
             $hashed_password = password_hash($password, PASSWORD_BCRYPT);
             $stmt = $conn->prepare("INSERT INTO utilisateurs (login, password) VALUES (?, ?)");
             $stmt->bind_param("ss", $login, $hashed_password);
             if ($stmt->execute()) {
                 $stmt->close();
                 $conn->close();
-                // Redirection sans affichage préalable
                 header("Location: connexion.php");
                 exit;
             } else {
@@ -53,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
+    <?php render_site_head(); ?>
 </head>
 <body>
     <?php render_site_header(); ?>

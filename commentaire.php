@@ -158,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($error)) {
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Ajouter un commentaire</title>
     <style>label{display:block;margin-top:8px;}textarea{width:100%;min-height:120px}</style>
+    <?php render_site_head(); ?>
 </head>
 <body>
     <?php render_site_header(); ?>

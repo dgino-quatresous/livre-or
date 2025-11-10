@@ -9,6 +9,7 @@ ensure_session_started();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accueil</title>
     <style>a{display:inline-block;margin-right:8px;}</style>
+    <?php render_site_head(); ?>
 </head>
 <body>
     <?php render_site_header(); ?>

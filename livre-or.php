@@ -94,6 +94,7 @@ if ($table && !$dbError) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Livre d'or</title>
+    <?php render_site_head(); ?>
     <style>
         body{font-family:Arial,Helvetica,sans-serif;padding:16px}
         .comment{border:1px solid #ddd;padding:12px;margin-bottom:12px;border-radius:6px}
@@ -118,18 +119,15 @@ if ($table && !$dbError) {
                 <div class="comment">
                     <div class="meta">
                         <?php
-                        // date
                         $displayDate = null;
                         if ($dateCol && isset($c[$dateCol]) && $c[$dateCol] !== null) {
                             $t = strtotime($c[$dateCol]);
                             if ($t !== false) $displayDate = date('d/m/Y', $t);
                             else $displayDate = htmlspecialchars($c[$dateCol]);
                         }
-                        // user
                         $displayUser = null;
                         if ($userCol && isset($c[$userCol]) && $c[$userCol] !== null) {
                             $rawUser = $c[$userCol];
-                            // if numeric, try to fetch login from utilisateurs
                             if (is_numeric($rawUser)) {
                                 $uStmt = $conn->prepare("SELECT login FROM utilisateurs WHERE id = ? LIMIT 1");
                                 if ($uStmt) {
@@ -143,7 +141,6 @@ if ($table && !$dbError) {
                                 $displayUser = $rawUser;
                             }
                         }
-                        // fallback values
                         if (!$displayDate) $displayDate = 'date inconnue';
                         if (!$displayUser) $displayUser = 'anonyme';
 
@@ -155,7 +152,6 @@ if ($table && !$dbError) {
                         $text = '';
                         if ($contentCol && isset($c[$contentCol])) $text = $c[$contentCol];
                         else {
-                            // try to show any text-like column
                             foreach ($c as $k=>$v) {
                                 if ($k === 'id' || $k === $userCol || $k === $dateCol) continue;
                                 if (is_string($v) && strlen($v) > 0) { $text = $v; break; }

@@ -6,12 +6,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $login = isset($_POST["login"]) ? trim($_POST["login"]) : '';
     $password = isset($_POST["password"]) ? $_POST["password"] : '';
 
-    // Connexion à la base de données
+
     $conn = new mysqli("localhost", "root", "", "livreor");
     if ($conn->connect_error) {
         $error = "Connexion échouée: " . $conn->connect_error;
     } else {
-        // Vérification des informations de connexion
         $stmt = $conn->prepare("SELECT password FROM utilisateurs WHERE login = ?");
         $stmt->bind_param("s", $login);
         $stmt->execute();
@@ -21,7 +20,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $row = $result->fetch_assoc();
             if (password_verify($password, $row["password"])) {
-                // Enregistrer l'utilisateur en session et rediriger
                 $_SESSION["user"] = $login;
                 $stmt->close();
                 $conn->close();
@@ -45,6 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion</title>
     <style>label{display:block;margin-top:8px;}input{display:block;margin-bottom:8px;}</style>
+    <?php render_site_head(); ?>
 </head>
 <body>
     <?php render_site_header(); ?>
